@@ -41,7 +41,7 @@ class FlyingRobotBlimpduino < ArduinoSketch
   output_pin 5, :as => :left_speed
   
   # vectoring servo
-  output_pin 11, :as => :vectoring_servo, :device => :servo
+  output_pin 10, :as => :vectoring_servo, :device => :servo
   
   
   define "MAX_SPEED 127"
@@ -81,24 +81,24 @@ class FlyingRobotBlimpduino < ArduinoSketch
   def elevators
     print_current_command("Elevators", current_elevator_deflection)
     if current_elevator_direction == 'c'
-      @deflection = 90
+      @deflection = 22
     end
     if current_elevator_direction == 'u'
-      @deflection = 90 - current_elevator_deflection
+      @deflection = 22 - (current_elevator_deflection / 4)
     end
     if current_elevator_direction == 'd'
-      @deflection = 90 + current_elevator_deflection
+      @deflection = 22 + (current_elevator_deflection / 4)
     end
 
-    if @deflection < 45
+    if @deflection < 0
+      @deflection = 0
+    end
+    if @deflection > 45
       @deflection = 45
     end
-    if @deflection > 135
-      @deflection = 135
-    end
     
-    servo_refresh
     vectoring_servo.position @deflection
+    servo_refresh
   end
     
   def rudder
