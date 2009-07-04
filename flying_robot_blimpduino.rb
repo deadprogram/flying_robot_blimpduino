@@ -49,6 +49,10 @@ class FlyingRobotBlimpduino < ArduinoSketch
   input_pin 7, :as => :ir_rear
   input_pin 9, :as => :ir_left
   
+  # ultrasonic sensor
+  input_pin 16, :as => :range_finder
+  output_pin 15, :as => :range_finder_reset
+  
   define "MAX_SPEED 127"
   @forward = "1, byte"
   @reverse = "0, byte"
@@ -67,7 +71,9 @@ class FlyingRobotBlimpduino < ArduinoSketch
   def loop
     be_flying_robot
     battery_test
+    range_finder.update_maxsonar(range_finder_reset)
     update_ir_receiver(ir_front, ir_right, ir_rear, ir_left)
+    
     handle_autopilot_update
     
     process_command
@@ -82,6 +88,8 @@ class FlyingRobotBlimpduino < ArduinoSketch
   def status
     serial_println "Status: operational"
     check_battery_voltage
+    check_ir
+    check_altitude
   end
   
   def elevators
@@ -124,6 +132,10 @@ class FlyingRobotBlimpduino < ArduinoSketch
     
     if current_command_instrument == 'i'
       check_ir
+    end
+
+    if current_command_instrument == 'a'
+      check_altitude
     end
   end
   
@@ -218,6 +230,11 @@ class FlyingRobotBlimpduino < ArduinoSketch
   def check_ir   
     serial_print "IR: "
     serial_println current_ir_beacon_direction
+  end
+  
+  def check_altitude
+    serial_print "Alt: "
+    serial_println maxsonar_distance
   end
   
   # autopilot
