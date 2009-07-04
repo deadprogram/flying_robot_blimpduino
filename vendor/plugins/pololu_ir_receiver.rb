@@ -12,6 +12,26 @@ class PololuIrReceiver < ArduinoPlugin
   # or else 1 = Forward, 2 = Right, 3 = Back, 4 = Left
   int current_ir_beacon_direction() {
     return ir_beacon_direction ;
+  }  
+  
+  boolean ir_beacon_not_detected() {
+    return ir_beacon_direction == 0 ;
+  }
+
+  boolean ir_beacon_forward() {
+    return ir_beacon_direction == 1 ;
+  }
+
+  boolean ir_beacon_right() {
+    return ir_beacon_direction == 2 ;
+  }
+
+  boolean ir_beacon_back() {
+    return ir_beacon_direction == 3 ;
+  }
+
+  boolean ir_beacon_left() {
+    return ir_beacon_direction == 4 ;
   }
     
   void reset_ir_receiver() {

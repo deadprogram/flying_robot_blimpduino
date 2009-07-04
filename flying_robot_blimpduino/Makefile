@@ -68,8 +68,8 @@ LIBRARY_ROOT = /Users/ron/Developer/flying_robot_blimpduino/vendor/libraries
 SRC = $(ARDUINO)/pins_arduino.c $(ARDUINO)/wiring.c \
 $(ARDUINO)/wiring_analog.c $(ARDUINO)/wiring_digital.c \
 $(ARDUINO)/wiring_pulse.c $(ARDUINO)/wiring_serial.c \
-$(ARDUINO)/wiring_shift.c $(ARDUINO)/WInterrupts.c /Applications/arduino-0015/hardware/libraries/Wire/utility/twi.c
-CXXSRC = $(ARDUINO)/HardwareSerial.cpp $(SOFTWARE_SERIAL)/SoftwareSerial.cpp $(ARDUINO)/Print.cpp $(LIBRARY_ROOT)/Wire/Wire.cpp $(LIBRARY_ROOT)/Servo/Servo.cpp
+$(ARDUINO)/wiring_shift.c $(ARDUINO)/WInterrupts.c 
+CXXSRC = $(ARDUINO)/HardwareSerial.cpp $(SOFTWARE_SERIAL)/SoftwareSerial.cpp $(ARDUINO)/Print.cpp $(LIBRARY_ROOT)/Servo/Servo.cpp
 MCU = atmega168
 ASRC = 
 F_CPU = 16000000
@@ -92,8 +92,8 @@ CDEFS = -DF_CPU=$(F_CPU)
 CXXDEFS = -DF_CPU=$(F_CPU)
 
 # Place -I options here
-CINCS = -I$(ARDUINO) -I$(SOFTWARE_SERIAL) -I$(LIBRARY_ROOT)/Wire -I$(LIBRARY_ROOT)/Servo
-+CXXINCS = -I$(ARDUINO) -I$(SOFTWARE_SERIAL) -I$(LIBRARY_ROOT)/Wire -I$(LIBRARY_ROOT)/Servo
+CINCS = -I$(ARDUINO) -I$(SOFTWARE_SERIAL) -I$(LIBRARY_ROOT)/Servo
++CXXINCS = -I$(ARDUINO) -I$(SOFTWARE_SERIAL) -I$(LIBRARY_ROOT)/Servo
 
 # Compiler flag to set the C Standard level.
 # c89   - "ANSI" C
@@ -435,22 +435,3 @@ WInterrupts.o:  \
   /Applications/arduino-0015/hardware/tools/avr/bin/../lib/gcc/avr/4.3.2/../../../../avr/include/avr/delay.h \
   /Applications/arduino-0015/hardware/tools/avr/bin/../lib/gcc/avr/4.3.2/../../../../avr/include/util/delay.h \
   /Applications/arduino-0015/hardware/tools/avr/bin/../lib/gcc/avr/4.3.2/../../../../avr/include/util/delay_basic.h
-twi.o: /Applications/arduino-0015/hardware/libraries/Wire/utility/twi.c \
-  /Applications/arduino-0015/hardware/tools/avr/bin/../lib/gcc/avr/4.3.2/../../../../avr/include/math.h \
-  /Applications/arduino-0015/hardware/tools/avr/bin/../lib/gcc/avr/4.3.2/../../../../avr/include/stdlib.h \
-  /Applications/arduino-0015/hardware/tools/avr/bin/../lib/gcc/avr/4.3.2/include/stddef.h \
-  /Applications/arduino-0015/hardware/tools/avr/bin/../lib/gcc/avr/4.3.2/../../../../avr/include/inttypes.h \
-  /Applications/arduino-0015/hardware/tools/avr/bin/../lib/gcc/avr/4.3.2/../../../../avr/include/stdint.h \
-  /Applications/arduino-0015/hardware/tools/avr/bin/../lib/gcc/avr/4.3.2/../../../../avr/include/avr/io.h \
-  /Applications/arduino-0015/hardware/tools/avr/bin/../lib/gcc/avr/4.3.2/../../../../avr/include/avr/sfr_defs.h \
-  /Applications/arduino-0015/hardware/tools/avr/bin/../lib/gcc/avr/4.3.2/../../../../avr/include/avr/iom168.h \
-  /Applications/arduino-0015/hardware/tools/avr/bin/../lib/gcc/avr/4.3.2/../../../../avr/include/avr/iomx8.h \
-  /Applications/arduino-0015/hardware/tools/avr/bin/../lib/gcc/avr/4.3.2/../../../../avr/include/avr/portpins.h \
-  /Applications/arduino-0015/hardware/tools/avr/bin/../lib/gcc/avr/4.3.2/../../../../avr/include/avr/common.h \
-  /Applications/arduino-0015/hardware/tools/avr/bin/../lib/gcc/avr/4.3.2/../../../../avr/include/avr/version.h \
-  /Applications/arduino-0015/hardware/tools/avr/bin/../lib/gcc/avr/4.3.2/../../../../avr/include/avr/fuse.h \
-  /Applications/arduino-0015/hardware/tools/avr/bin/../lib/gcc/avr/4.3.2/../../../../avr/include/avr/lock.h \
-  /Applications/arduino-0015/hardware/tools/avr/bin/../lib/gcc/avr/4.3.2/../../../../avr/include/avr/interrupt.h \
-  /Applications/arduino-0015/hardware/tools/avr/bin/../lib/gcc/avr/4.3.2/../../../../avr/include/compat/twi.h \
-  /Applications/arduino-0015/hardware/tools/avr/bin/../lib/gcc/avr/4.3.2/../../../../avr/include/util/twi.h \
-  /Applications/arduino-0015/hardware/libraries/Wire/utility/twi.h

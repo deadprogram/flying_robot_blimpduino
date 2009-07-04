@@ -43,6 +43,11 @@ class FlyingRobotBlimpduino < ArduinoSketch
   # vectoring servo
   output_pin 10, :as => :vectoring_servo, :device => :servo
   
+  # IR sensors
+  input_pin 8, :as => :ir_front
+  input_pin 6, :as => :ir_right
+  input_pin 7, :as => :ir_rear
+  input_pin 9, :as => :ir_left
   
   define "MAX_SPEED 127"
   @forward = "1, byte"
@@ -62,6 +67,7 @@ class FlyingRobotBlimpduino < ArduinoSketch
   def loop
     be_flying_robot
     battery_test
+    update_ir_receiver(ir_front, ir_right, ir_rear, ir_left)
     handle_autopilot_update
     
     process_command
@@ -112,8 +118,13 @@ class FlyingRobotBlimpduino < ArduinoSketch
   end
     
   def instruments
-    serial_print "Instruments command - request:"
-    serial_println current_command_instrument
+    if current_command_instrument == 'b'
+      check_battery_voltage
+    end
+    
+    if current_command_instrument == 'i'
+      check_ir
+    end
   end
   
   def autopilot
@@ -200,68 +211,66 @@ class FlyingRobotBlimpduino < ArduinoSketch
   
   # instruments
   def check_battery_voltage
-    serial_print "Battery voltage: "
+    serial_print "Battery: "
     serial_println int(battery.voltage)
   end
   
+  def check_ir   
+    serial_print "IR: "
+    serial_println current_ir_beacon_direction
+  end
+  
+  # autopilot
   def handle_autopilot_update
     if is_autopilot_on && millis() - @last_autopilot_update > @autopilot_update_frequency
       if current_command_autopilot == '1'
-        #get_compass
-        
-        if heading <= 330 && heading >= 30
-          # turn left 
-          @left_direction = @forward
-          @right_direction = @forward
-          @left_motor_speed = 0
-          @right_motor_speed = 0
-          
-          activate_thrusters
-        end
-
-        if heading < 330 && heading >= 270
-          # turn right
-          @left_direction = @forward
-          @right_direction = @reverse
-          @left_motor_speed = 6
-          @right_motor_speed = 6
-          
-          activate_thrusters
-        end
-
-        if heading < 270 && heading >= 180
-          # turn right
-          @left_direction = @forward
-          @right_direction = @reverse
-          @left_motor_speed = 8
-          @right_motor_speed = 8
-          
-          activate_thrusters
-        end
-
-        if heading < 180 && heading > 90
-          # turn left 
-          @left_direction = @reverse
-          @right_direction = @forward
-          @left_motor_speed = 8
-          @right_motor_speed = 8
-          
-          activate_thrusters
-        end
-
-        if heading <= 90 && heading > 30
-          # turn left 
-          @left_direction = @reverse
-          @right_direction = @forward
-          @left_motor_speed = 6
-          @right_motor_speed = 6
-          
-          activate_thrusters
-        end
-        
+        navigate_using_ir
       end
+
+      # if current_command_autopilot == '2'
+      #   navigate_using_range_finder
+      # end
     
       @last_autopilot_update = millis()
     end
   end
+  
+  def navigate_using_ir
+    if ir_beacon_not_detected
+      @left_motor_speed = 0
+      @right_motor_speed = 0
+      @left_direction = @forward
+      @right_direction = @forward
+    end
+    
+    if ir_beacon_forward
+      @left_motor_speed = 0
+      @right_motor_speed = 0
+      @left_direction = @forward
+      @right_direction = @forward
+    end
+    
+    if ir_beacon_right
+      @left_motor_speed = MAX_SPEED / 10
+      @left_direction = @forward	          
+      @right_motor_speed = MAX_SPEED / 10
+      @right_direction = @reverse
+    end
+    
+    if ir_beacon_back
+      @left_motor_speed = MAX_SPEED / 10
+      @left_direction = @forward
+      @right_motor_speed = MAX_SPEED / 10
+      @right_direction = @reverse
+    end
+    
+    if ir_beacon_left
+      @left_motor_speed = MAX_SPEED / 10
+      @left_direction = @reverse
+      @right_motor_speed = MAX_SPEED / 10
+      @right_direction = @forward
+    end
+    activate_thrusters
+  end
+  
 end
