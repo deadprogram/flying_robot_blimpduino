@@ -50,10 +50,7 @@ class FlyingRobotBlimpduino < ArduinoSketch
   input_pin 9, :as => :ir_left
   
   # ultrasonic sensor
-  #input_pin 16 #, :as => :range_finder, :device => :sensor
   input_pin 2, :as => :range_finder
-  #@range_finder = "2, int"
-  #@range_finder_reset = "15, int"
   output_pin 15, :as => :range_finder_reset
   @dist = "0, long"
   
@@ -76,7 +73,6 @@ class FlyingRobotBlimpduino < ArduinoSketch
     be_flying_robot
     battery_test
     range_finder.update_maxsonar(range_finder_reset)
-    #update_maxsonar(@range_finder, @range_finder_reset)
     update_ir_receiver(ir_front, ir_right, ir_rear, ir_left)
     
     handle_autopilot_update
