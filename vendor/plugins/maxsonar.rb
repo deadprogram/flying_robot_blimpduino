@@ -52,10 +52,9 @@ class Maxsonar < ArduinoPlugin
     }
     
     last_maxsonar_distance = 0;
-    ping_rx = reset_pin ;
-    digitalWrite(ping_rx, HIGH);
-    digitalWrite(ping_rx, LOW); // Activating MCU internal pull-down resistor
-    digitalWrite(ping_rx, HIGH);
+    digitalWrite(reset_pin, HIGH);
+    digitalWrite(reset_pin, LOW); // Activating MCU internal pull-down resistor
+    digitalWrite(reset_pin, HIGH);
     delay(1000);
     maxsonar_init_complete = true ;
   }

@@ -28,7 +28,7 @@
 #   id - enter an id for which autopilot routine should be turned on. Entering '0' is reserved to turn Off the autopilot.
 #
 class FlyingRobotBlimpduino < ArduinoSketch
-  serial_begin :rate => 19200
+  serial_begin :rate => 38400
   
   # read battery voltage, to protect our expensive LiPo from going below minimum power.
   input_pin 0, :as => :battery
@@ -67,6 +67,11 @@ class FlyingRobotBlimpduino < ArduinoSketch
   @deflection_val = "0, long"
   @autopilot_update_frequency = "500, unsigned long"
   @last_autopilot_update = "0, unsigned long"
+  
+  def setup
+    # this should zero out the L293
+    activate_thrusters
+  end
   
   # main command loop, required for any arduino program
   def loop
