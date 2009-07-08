@@ -61,7 +61,7 @@ class FlyingRobotBlimpduino < ArduinoSketch
   output_pin 13, :as => :led_left
   
   define "MINIMUM_ALTITUDE 36"
-  define "MAX_SPEED 127"
+  define "MAX_SPEED 85"
   @forward = "1, byte"
   @reverse = "0, byte"
   @direction = "1, byte"
