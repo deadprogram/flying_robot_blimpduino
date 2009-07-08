@@ -54,6 +54,13 @@ class FlyingRobotBlimpduino < ArduinoSketch
   output_pin 15, :as => :range_finder_reset
   @dist = "0, long"
   
+  # LEDs
+  output_pin 12, :as => :led_forward
+  output_pin 17, :as => :led_right
+  output_pin 11, :as => :led_back
+  output_pin 13, :as => :led_left
+  
+  define "MINIMUM_ALTITUDE 36"
   define "MAX_SPEED 127"
   @forward = "1, byte"
   @reverse = "0, byte"
@@ -67,6 +74,8 @@ class FlyingRobotBlimpduino < ArduinoSketch
   @deflection_val = "0, long"
   @autopilot_update_frequency = "500, unsigned long"
   @last_autopilot_update = "0, unsigned long"
+  @led_update_frequency = "500, unsigned long"
+  @last_led_update = "0, unsigned long"
   
   def setup
     # this should zero out the L293
@@ -79,6 +88,7 @@ class FlyingRobotBlimpduino < ArduinoSketch
     battery_test
     range_finder.update_maxsonar(range_finder_reset)
     update_ir_receiver(ir_front, ir_right, ir_rear, ir_left)
+    update_leds
     
     handle_autopilot_update
     
@@ -227,6 +237,49 @@ class FlyingRobotBlimpduino < ArduinoSketch
     return @deflection_percent * current_throttle_speed * MAX_SPEED
   end
   
+  # LEDs
+  def update_leds
+    if millis() - @last_led_update > @led_update_frequency
+      leds_off
+    
+      if ir_beacon_forward
+        led_forward.digitalWrite( HIGH );
+      end
+
+      if ir_beacon_right
+        led_right.digitalWrite( HIGH );
+      end
+
+      if ir_beacon_back
+        led_back.digitalWrite( HIGH );
+      end
+
+      if ir_beacon_left
+        led_left.digitalWrite( HIGH );
+      end
+      
+      if maxsonar_distance > 0 && maxsonar_distance < MINIMUM_ALTITUDE
+        leds_on
+      end
+      
+      @last_led_update = millis()
+    end
+  end
+
+  def leds_on
+    led_forward.digitalWrite( HIGH );
+    led_right.digitalWrite( HIGH );
+    led_back.digitalWrite( HIGH );
+    led_left.digitalWrite( HIGH );
+  end
+  
+  def leds_off
+    led_forward.digitalWrite( LOW );
+    led_right.digitalWrite( LOW );
+    led_back.digitalWrite( LOW );
+    led_left.digitalWrite( LOW );
+  end
+  
   # instruments
   def check_battery_voltage
     serial_print "Battery: "
@@ -274,23 +327,23 @@ class FlyingRobotBlimpduino < ArduinoSketch
     end
     
     if ir_beacon_right
-      @left_motor_speed = MAX_SPEED / 10
+      @left_motor_speed = MAX_SPEED / 8
       @left_direction = @forward	          
-      @right_motor_speed = MAX_SPEED / 10
+      @right_motor_speed = MAX_SPEED / 8
       @right_direction = @reverse
     end
     
     if ir_beacon_back
-      @left_motor_speed = MAX_SPEED / 10
+      @left_motor_speed = MAX_SPEED / 8
       @left_direction = @forward
-      @right_motor_speed = MAX_SPEED / 10
+      @right_motor_speed = MAX_SPEED / 8
       @right_direction = @reverse
     end
     
     if ir_beacon_left
-      @left_motor_speed = MAX_SPEED / 10
+      @left_motor_speed = MAX_SPEED / 8
       @left_direction = @reverse
-      @right_motor_speed = MAX_SPEED / 10
+      @right_motor_speed = MAX_SPEED / 8
       @right_direction = @forward
     end
     activate_thrusters
