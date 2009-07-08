@@ -54,15 +54,18 @@ class FlyingRobotBlimpduino < ArduinoSketch
   output_pin 15, :as => :range_finder_reset
   @dist = "0, long"
   
-  # LEDs
-  output_pin 12, :as => :led_forward
-  output_pin 17, :as => :led_right
-  output_pin 11, :as => :led_back
-  output_pin 13, :as => :led_left
+  # optional LEDs
+  # output_pin 12, :as => :led_forward
+  # output_pin 17, :as => :led_right
+  # output_pin 11, :as => :led_back
+  # output_pin 13, :as => :led_left
+  
+  # optional digital compass
+  output_pin 19, :as => :wire, :device => :i2c, :enable => :true
   
   define "MINIMUM_ALTITUDE 36"
   define "MAX_SPEED 85"
-  define "AUTOPILOT_THRUST_FACTOR 5"
+  define "AUTOPILOT_THRUST_FACTOR 6"
   @forward = "1, byte"
   @reverse = "0, byte"
   @direction = "1, byte"
@@ -89,7 +92,7 @@ class FlyingRobotBlimpduino < ArduinoSketch
     battery_test
     range_finder.update_maxsonar(range_finder_reset)
     update_ir_receiver(ir_front, ir_right, ir_rear, ir_left)
-    update_leds
+    #update_leds
     
     handle_autopilot_update
     
@@ -107,6 +110,7 @@ class FlyingRobotBlimpduino < ArduinoSketch
     check_battery_voltage
     check_ir
     check_altitude
+    check_compass
   end
   
   def elevators
@@ -154,6 +158,10 @@ class FlyingRobotBlimpduino < ArduinoSketch
     if current_command_instrument == 'a'
       check_altitude
     end
+
+    if current_command_instrument == 'c'
+      check_compass
+    end
   end
   
   def autopilot
@@ -167,7 +175,13 @@ class FlyingRobotBlimpduino < ArduinoSketch
     if current_command_autopilot == '1'
       # follow IR beacon
       autopilot_on
-      serial_println "Autopilot Is On"
+      serial_println "Autopilot 1 On"
+    end
+
+    if current_command_autopilot == '2'
+      # use digial compass to set orientation to North
+      autopilot_on
+      serial_println "Autopilot 2 On"
     end
   end
   
@@ -239,62 +253,79 @@ class FlyingRobotBlimpduino < ArduinoSketch
   end
   
   # LEDs
-  def update_leds
-    if millis() - @last_led_update > @led_update_frequency
-      leds_off
-    
-      if ir_beacon_forward
-        led_forward.digitalWrite( HIGH );
-      end
-
-      if ir_beacon_right
-        led_right.digitalWrite( HIGH );
-      end
-
-      if ir_beacon_back
-        led_back.digitalWrite( HIGH );
-      end
-
-      if ir_beacon_left
-        led_left.digitalWrite( HIGH );
-      end
-      
-      if maxsonar_distance > 0 && maxsonar_distance < MINIMUM_ALTITUDE
-        leds_on
-      end
-      
-      @last_led_update = millis()
-    end
-  end
-
-  def leds_on
-    led_forward.digitalWrite( HIGH );
-    led_right.digitalWrite( HIGH );
-    led_back.digitalWrite( HIGH );
-    led_left.digitalWrite( HIGH );
-  end
-  
-  def leds_off
-    led_forward.digitalWrite( LOW );
-    led_right.digitalWrite( LOW );
-    led_back.digitalWrite( LOW );
-    led_left.digitalWrite( LOW );
-  end
+  # def update_leds
+  #   if millis() - @last_led_update > @led_update_frequency
+  #     leds_off
+  #   
+  #     if ir_beacon_forward
+  #       led_forward.digitalWrite( HIGH );
+  #     end
+  # 
+  #     if ir_beacon_right
+  #       led_right.digitalWrite( HIGH );
+  #     end
+  # 
+  #     if ir_beacon_back
+  #       led_back.digitalWrite( HIGH );
+  #     end
+  # 
+  #     if ir_beacon_left
+  #       led_left.digitalWrite( HIGH );
+  #     end
+  #     
+  #     if maxsonar_distance > 0 && maxsonar_distance < MINIMUM_ALTITUDE
+  #       leds_on
+  #     end
+  #     
+  #     @last_led_update = millis()
+  #   end
+  # end
+  # 
+  # def leds_on
+  #   led_forward.digitalWrite( HIGH );
+  #   led_right.digitalWrite( HIGH );
+  #   led_back.digitalWrite( HIGH );
+  #   led_left.digitalWrite( HIGH );
+  # end
+  # 
+  # def leds_off
+  #   led_forward.digitalWrite( LOW );
+  #   led_right.digitalWrite( LOW );
+  #   led_back.digitalWrite( LOW );
+  #   led_left.digitalWrite( LOW );
+  # end
   
   # instruments
+  # check LiPo battery votage
   def check_battery_voltage
     serial_print "Battery: "
     serial_println int(battery.voltage)
   end
   
+  # check state of infrared sensor array
   def check_ir   
     serial_print "IR: "
     serial_println current_ir_beacon_direction
   end
   
+  # check reading on ultrasonic range finder
   def check_altitude
     serial_print "Alt: "
     serial_println maxsonar_distance
+  end
+  
+  # check reading on digital compass
+  def get_compass
+    prepare_compass
+    read_compass
+  end
+
+  def check_compass
+    get_compass
+    serial_print "Compass heading: "
+    serial_print heading
+    serial_print "."
+    serial_println heading_fractional
   end
   
   # autopilot
@@ -304,9 +335,9 @@ class FlyingRobotBlimpduino < ArduinoSketch
         navigate_using_ir
       end
 
-      # if current_command_autopilot == '2'
-      #   navigate_using_range_finder
-      # end
+      if current_command_autopilot == '2'
+        navigate_using_compass
+      end
     
       @last_autopilot_update = millis()
     end
@@ -348,6 +379,37 @@ class FlyingRobotBlimpduino < ArduinoSketch
       @right_direction = @forward
     end
     activate_thrusters
+  end
+  
+  # the Honeywell digital compass is installed by reverse on the Blimpduino by default
+  def navigate_using_compass
+    get_compass
+    
+    if heading <= 210 && heading >= 150
+      # in front of us, so do nothing
+      @left_direction = @forward
+      @right_direction = @forward
+      @left_motor_speed = 0
+      @right_motor_speed = 0
+    end
+
+    if heading < 210 && heading >= 0
+      # facing west, turn right
+      @left_direction = @forward
+      @right_direction = @reverse
+      @left_motor_speed = MAX_SPEED / AUTOPILOT_THRUST_FACTOR
+      @right_motor_speed = MAX_SPEED / AUTOPILOT_THRUST_FACTOR
+    end
+
+    if heading < 360 && heading > 150
+      # facing east, turn left
+      @left_direction = @reverse
+      @right_direction = @forward
+      @left_motor_speed = MAX_SPEED / AUTOPILOT_THRUST_FACTOR
+      @right_motor_speed = MAX_SPEED / AUTOPILOT_THRUST_FACTOR
+    end
+
+    activate_thrusters    
   end
   
 end
