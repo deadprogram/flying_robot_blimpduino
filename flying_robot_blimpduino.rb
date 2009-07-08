@@ -107,9 +107,13 @@ class FlyingRobotBlimpduino < ArduinoSketch
   
   def status
     serial_println "Status: operational"
+    serial_print "Battery: "
     check_battery_voltage
+    serial_print "IR: "
     check_ir
+    serial_print "Altitude: "
     check_altitude
+    serial_print "Compass: "
     check_compass
   end
   
@@ -298,19 +302,16 @@ class FlyingRobotBlimpduino < ArduinoSketch
   # instruments
   # check LiPo battery votage
   def check_battery_voltage
-    serial_print "Battery: "
     serial_println int(battery.voltage)
   end
   
   # check state of infrared sensor array
   def check_ir   
-    serial_print "IR: "
     serial_println current_ir_beacon_direction
   end
   
   # check reading on ultrasonic range finder
   def check_altitude
-    serial_print "Alt: "
     serial_println maxsonar_distance
   end
   
@@ -322,7 +323,6 @@ class FlyingRobotBlimpduino < ArduinoSketch
 
   def check_compass
     get_compass
-    serial_print "Compass heading: "
     serial_print heading
     serial_print "."
     serial_println heading_fractional
@@ -389,11 +389,11 @@ class FlyingRobotBlimpduino < ArduinoSketch
       # in front of us, so do nothing
       @left_direction = @forward
       @right_direction = @forward
-      @left_motor_speed = 0
-      @right_motor_speed = 0
+      @left_motor_speed = 1
+      @right_motor_speed = 1
     end
 
-    if heading < 210 && heading >= 0
+    if heading < 150 && heading >= 0
       # facing west, turn right
       @left_direction = @forward
       @right_direction = @reverse
@@ -401,7 +401,7 @@ class FlyingRobotBlimpduino < ArduinoSketch
       @right_motor_speed = MAX_SPEED / AUTOPILOT_THRUST_FACTOR
     end
 
-    if heading < 360 && heading > 150
+    if heading < 360 && heading > 210
       # facing east, turn left
       @left_direction = @reverse
       @right_direction = @forward
