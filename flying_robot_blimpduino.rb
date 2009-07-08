@@ -62,6 +62,7 @@ class FlyingRobotBlimpduino < ArduinoSketch
   
   define "MINIMUM_ALTITUDE 36"
   define "MAX_SPEED 85"
+  define "AUTOPILOT_THRUST_FACTOR 5"
   @forward = "1, byte"
   @reverse = "0, byte"
   @direction = "1, byte"
@@ -327,23 +328,23 @@ class FlyingRobotBlimpduino < ArduinoSketch
     end
     
     if ir_beacon_right
-      @left_motor_speed = MAX_SPEED / 8
+      @left_motor_speed = MAX_SPEED / AUTOPILOT_THRUST_FACTOR
       @left_direction = @forward	          
-      @right_motor_speed = MAX_SPEED / 8
+      @right_motor_speed = MAX_SPEED / AUTOPILOT_THRUST_FACTOR
       @right_direction = @reverse
     end
     
     if ir_beacon_back
-      @left_motor_speed = MAX_SPEED / 8
+      @left_motor_speed = MAX_SPEED / AUTOPILOT_THRUST_FACTOR
       @left_direction = @forward
-      @right_motor_speed = MAX_SPEED / 8
+      @right_motor_speed = MAX_SPEED / AUTOPILOT_THRUST_FACTOR
       @right_direction = @reverse
     end
     
     if ir_beacon_left
-      @left_motor_speed = MAX_SPEED / 8
+      @left_motor_speed = MAX_SPEED / AUTOPILOT_THRUST_FACTOR
       @left_direction = @reverse
-      @right_motor_speed = MAX_SPEED / 8
+      @right_motor_speed = MAX_SPEED / AUTOPILOT_THRUST_FACTOR
       @right_direction = @forward
     end
     activate_thrusters
