@@ -50,7 +50,7 @@ class FlyingRobotBlimpduino < ArduinoSketch
   input_pin 9, :as => :ir_left
   
   # ultrasonic sensor
-  input_pin 2, :as => :range_finder
+  input_pin 16, :as => :range_finder
   output_pin 15, :as => :range_finder_reset
   @dist = "0, long"
   
@@ -64,7 +64,7 @@ class FlyingRobotBlimpduino < ArduinoSketch
   output_pin 19, :as => :wire, :device => :i2c, :enable => :true
   
   define "MINIMUM_ALTITUDE 36"
-  define "MAX_SPEED 85"
+  define "MAX_SPEED 127"
   define "AUTOPILOT_THRUST_FACTOR 6"
   @forward = "1, byte"
   @reverse = "0, byte"
@@ -342,7 +342,7 @@ class FlyingRobotBlimpduino < ArduinoSketch
       @last_autopilot_update = millis()
     end
   end
-  
+    
   def navigate_using_ir
     if ir_beacon_not_detected
       @left_motor_speed = 0
