@@ -120,20 +120,20 @@ class FlyingRobotBlimpduino < ArduinoSketch
   def elevators
     print_current_command("Elevators", current_elevator_deflection)
     if current_elevator_direction == 'c'
-      @deflection = 22
+      @deflection = 45
     end
     if current_elevator_direction == 'u'
-      @deflection = 22 - (current_elevator_deflection / 4)
+      @deflection = 45 - (current_elevator_deflection / 4)
     end
     if current_elevator_direction == 'd'
-      @deflection = 22 + (current_elevator_deflection / 4)
+      @deflection = 45 + (current_elevator_deflection / 4)
     end
 
     if @deflection < 0
       @deflection = 0
     end
-    if @deflection > 45
-      @deflection = 45
+    if @deflection > 90
+      @deflection = 90
     end
     
     vectoring_servo.position @deflection
