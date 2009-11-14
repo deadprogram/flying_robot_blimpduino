@@ -139,7 +139,11 @@ class FlyingRobotBlimpduino < ArduinoSketch
     vectoring_servo.position @deflection
     servo_refresh
   end
-    
+  
+  def ailerons
+    serial_println "No Ailerons"
+  end
+  
   def rudder
     print_current_command("Rudder", current_rudder_deflection)
     set_thrusters
