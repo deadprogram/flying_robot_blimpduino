@@ -50,7 +50,7 @@ class FlyingRobotBlimpduino < ArduinoSketch
   input_pin 9, :as => :ir_left
   
   # ultrasonic sensor
-  input_pin 16, :as => :range_finder
+  input_pin 2, :as => :range_finder
   output_pin 15, :as => :range_finder_reset
   @dist = "0, long"
   
