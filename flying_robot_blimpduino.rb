@@ -31,7 +31,7 @@ class FlyingRobotBlimpduino < ArduinoSketch
   serial_begin :rate => 38400
   
   # read battery voltage, to protect our expensive LiPo from going below minimum power.
-  input_pin 0, :as => :battery
+  define "BATTERY_PIN 0"
   
   # L293D motor controller
   output_pin 2, :as => :right_motor
@@ -50,7 +50,7 @@ class FlyingRobotBlimpduino < ArduinoSketch
   input_pin 9, :as => :ir_left
   
   # ultrasonic sensor
-  input_pin 2, :as => :range_finder
+  define "RANGE_FINDER_PIN 2"
   output_pin 15, :as => :range_finder_reset
   @dist = "0, long"
   
@@ -90,7 +90,7 @@ class FlyingRobotBlimpduino < ArduinoSketch
   def loop
     be_flying_robot
     battery_test
-    range_finder.update_maxsonar(range_finder_reset)
+    update_maxsonar(RANGE_FINDER_PIN, range_finder_reset)
     update_ir_receiver(ir_front, ir_right, ir_rear, ir_left)
     #update_leds
     
@@ -306,7 +306,7 @@ class FlyingRobotBlimpduino < ArduinoSketch
   # instruments
   # check LiPo battery votage
   def check_battery_voltage
-    serial_println int(battery.voltage)
+    serial_println int(voltage(BATTERY_PIN))
   end
   
   # check state of infrared sensor array
