@@ -107,13 +107,9 @@ class FlyingRobotBlimpduino < ArduinoSketch
   
   def status
     serial_println "Status: operational"
-    serial_print "Battery: "
     check_battery_voltage
-    serial_print "IR: "
     check_ir
-    serial_print "Altitude: "
     check_altitude
-    serial_print "Compass: "
     check_compass
   end
   
@@ -306,16 +302,19 @@ class FlyingRobotBlimpduino < ArduinoSketch
   # instruments
   # check LiPo battery votage
   def check_battery_voltage
+    serial_print "Battery: "
     serial_println int(voltage(BATTERY_PIN))
   end
   
   # check state of infrared sensor array
-  def check_ir   
+  def check_ir
+    serial_print "IR: "   
     serial_println current_ir_beacon_direction
   end
   
   # check reading on ultrasonic range finder
   def check_altitude
+    serial_print "Alt: "   
     serial_println maxsonar_distance
   end
   
@@ -327,6 +326,7 @@ class FlyingRobotBlimpduino < ArduinoSketch
 
   def check_compass
     get_compass
+    serial_print "Compass: "
     serial_print heading
     serial_print "."
     serial_println heading_fractional
